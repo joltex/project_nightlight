@@ -1,3 +1,10 @@
+""" converter.py
+
+This module contains functions for converting video files to Nightlight files - text files
+which store the RGB values for each pixel in each frame of a video. These files can then be
+read by the Nightlight.
+
+"""
 import json
 from PIL import Image, GifImagePlugin
 
@@ -39,7 +46,7 @@ def write_rgb_map_to_file(rgb_map, outfile, pretty=False):
 
     :param rgb_map: RGB map data structure - nested list where 1st level = frames of a video,
                     2nd level = rows of a frame, 3rd level = RGB values of a row.
-    :param outfile: Path to file to write the RGB map to.
+    :param outfile: Output file path.
     :param pretty: If True, write the RGB map to the file using newlines to separate each row of
                    each frame.
     """
@@ -51,6 +58,20 @@ def write_rgb_map_to_file(rgb_map, outfile, pretty=False):
 
 
 def write_rgb_map_to_file_pretty(rgb_map, outfile):
+    """ Write an RGB map to a text file in a human-readable format
+
+    Output format:
+        # Frame 1
+        [(102, 255, 130), (200, 173, 87)]
+        [(200, 39, 150), (10, 144, 87)]
+        # Frame 2
+        [(56, 23, 0), (255, 66, 120)]
+        ...
+
+    :param rgb_map: RGB map data structure - nested list where 1st level = frames of a video,
+                    2nd level = rows of a frame, 3rd level = RGB values of a row.
+    :param outfile: Output file path.
+    """
     with open(outfile, 'w') as fout:
         for i, frame in enumerate(rgb_map):
             fout.write(f'# Frame {i+1}\n')
