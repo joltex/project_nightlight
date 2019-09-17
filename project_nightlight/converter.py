@@ -6,7 +6,36 @@ read by the Nightlight.
 
 """
 import json
+import os
 from PIL import Image, GifImagePlugin
+
+
+def convert_frames_to_file(frames, outfile):
+    """ Convert a collection of video frames to a Nightlight file
+
+    :param frames: Either a path to a directory of images or a list of Pillow Image objects. If
+                   frames is a path, the frame order is expected to match the alphanumeric
+                   order of the filenames (eg 1.png, 2.png etc.). If frames is a list, the frame
+                   order is expected to match the order of the list elements.
+    :param outfile: Output file path.
+    """
+    def validate_input(frames):
+        valid_extensions = ['.png', '.jpg']
+        if isinstance(frames, str) and os.path.isdir(frames):
+            files = [x for x in os.listdir(frames) if x.endswith(tuple(valid_extensions))]
+            files.sort()
+            image_objs = [Image.open(os.path.join(frames, x)) for x in files]
+        elif isinstance(frames, list):
+            if not all(isinstance(x, Image.Image) for x in frames):
+                raise TypeError('frames must be a directory or a list of Pillow Image objects.')
+            image_objs = frames
+        else:
+            raise TypeError('frames must be a directory or a list of Pillow Image objects.')
+        return image_objs
+
+    image_objs = validate_input(frames)
+    rgb_map = [get_rgb_map_from_image(x) for x in image_objs]
+    write_rgb_map_to_file(rgb_map, outfile)
 
 
 def get_rgb_map_from_gif(gif_file):
