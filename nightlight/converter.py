@@ -11,6 +11,10 @@ import subprocess
 from PIL import Image, GifImagePlugin
 
 
+def main():
+    pass
+
+
 def convert_frames_to_file(frames, outfile):
     """ Convert a collection of video frames to a Nightlight file
 
@@ -90,6 +94,29 @@ def get_rgb_map_from_image(img_obj):
     return rgb_map
 
 
+def process_video(path, resolution=(30, 18), fps=30):
+    """ Fully process a video or directory of videos into Nightlight format
+
+    Scale the video to the appropriate resolution, convert it to frames, and then parse the RGB
+    values from each frame.
+
+    :param path: Either a path to an input video file or a directory of video files.
+    :param resolution: Resolution (in pixels) to scale the video to.
+    :param fps: Frames per second to use.
+    """
+    if isinstance(path, str) and os.path.isdir(path):
+        pass
+    elif isinstance(path, str) and os.path.exists(path):
+        videos = [path]
+    else:
+        raise TypeError('Input must be either a video file or a directory of video files')
+
+    for video in videos:
+        basedir = os.path.dirname(path)
+        out
+
+
+
 def scale_video(infile, outfile, resolution=(30, 18)):
     """ Scale a video using ffmpeg
 
@@ -97,7 +124,7 @@ def scale_video(infile, outfile, resolution=(30, 18)):
 
     :param infile: Input video file path.
     :param outfile: Output video file path.
-    :param resolution: Resolution to scale the video to.
+    :param resolution: Resolution (in pixels) to scale the video to.
     """
     cmd = f'ffmpeg -i {infile} -vf scale={resolution[0]}:{resolution[1]} {outfile}'
     print(cmd)
