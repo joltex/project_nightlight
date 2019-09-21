@@ -7,6 +7,7 @@ read by the Nightlight.
 """
 import json
 import os
+import subprocess
 from PIL import Image, GifImagePlugin
 
 
@@ -36,6 +37,25 @@ def convert_frames_to_file(frames, outfile):
     image_objs = validate_input(frames)
     rgb_map = [get_rgb_map_from_image(x) for x in image_objs]
     write_rgb_map_to_file(rgb_map, outfile)
+
+
+def convert_video_to_frames(video_file, outdir, fps=30):
+    """ Convert a video file to a collection of frames (saved as image files) using ffmpeg
+
+    This function requires that ffmpeg by available on the system path.
+
+    :param video_file: Input video file path.
+    :param outdir: Directory path to save the frame images to.
+    :param fps: Frames per second to use.
+    """
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+    outpath = os.path.join(outdir, '%d.png')
+
+    cmd = f'ffmpeg -i {video_file} -vf fps={fps} {outpath}'
+    print(cmd)
+    output = subprocess.check_output(cmd.split())
+    print(output)
 
 
 def get_rgb_map_from_gif(gif_file):
@@ -68,6 +88,21 @@ def get_rgb_map_from_image(img_obj):
         rgb_map.append(row_rgb_map)
 
     return rgb_map
+
+
+def scale_video(infile, outfile, resolution=(30, 18)):
+    """ Scale a video using ffmpeg
+
+    This function requires that ffmpeg by available on the system path.
+
+    :param infile: Input video file path.
+    :param outfile: Output video file path.
+    :param resolution: Resolution to scale the video to.
+    """
+    cmd = f'ffmpeg -i {infile} -vf scale={resolution[0]}:{resolution[1]} {outfile}'
+    print(cmd)
+    output = subprocess.check_output(cmd.split())
+    print(output)
 
 
 def write_rgb_map_to_file(rgb_map, outfile, pretty=False):
