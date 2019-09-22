@@ -5,6 +5,7 @@ which store the RGB values for each pixel in each frame of a video. These files 
 read by the Nightlight.
 
 """
+import argparse
 import json
 import os
 import subprocess
@@ -14,7 +15,37 @@ DEFAULT_RESOLUTION = (30, 18)
 
 
 def main():
-    pass
+    """
+    Commandline entrypoint - parses args and calls process_video().
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('path', help='Path to a video file or a directory of video files.')
+    parser.add_argument('-o', '--outdir', help='Directory to save the converted video(s) to.')
+    parser.add_argument('-r', '--resolution', type=str, help='Resolution to scale the video to -'
+                                                             ' width x height. eg 30x18')
+    parser.add_argument('-f', '--fps', type=int, help='Frames per second to use when converting'
+                                                       ' the video to frames')
+    parser.add_argument('-s', '--scale_method', help='Scaling method to use (bicubic, neighbor,'
+                                                     ' gauss, etc.)')
+    parser.add_argument('-c', '--contrast', type=float, help='-1000.0 to 1000.0')
+    parser.add_argument('-b', '--brightness', type=float, help='-1.0 to 1.0')
+    parser.add_argument('-a', '--saturation', type=float, help='0.0 to 3.0')
+    parser.add_argument('-g', '--gamma', type=float, help='0.1 to 10.0')
+    args = parser.parse_args()
+    filtered_args = {key: value for key, value in vars(args).items() if value is not None}
+
+    if 'resolution' in filtered_args:
+        try:
+            parsed_resolution = filtered_args['resolution'].lower().split('x')
+            parsed_resolution = tuple(map(int, parsed_resolution))
+            if len(parsed_resolution) != 2:
+                raise ValueError()
+            filtered_args['resolution'] = parsed_resolution
+        except:
+            raise ValueError('Unable to parse resolution "{}". Must be in the format width'
+                             ' x height - eg 30x18.'.format(filtered_args['resolution']))
+
+    process_video(**filtered_args)
 
 
 def convert_frames_to_file(frames, outfile):
