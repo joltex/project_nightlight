@@ -62,7 +62,17 @@ def convert_video_to_frames(video_file, outdir, fps=30):
     print(output)
 
 
+def get_ffmpeg_supported_formats():
+    """ Get a list of video formats supported by the local ffmpeg installation
 
+    :return: List of file extensions supported by the local ffmpeg installation.
+    """
+    supported_formats = []
+    r = subprocess.check_output(['ffmpeg', '-formats'], universal_newlines=True)
+    for line in r.split('\n')[4:]:
+        if line.startswith(' D') or line.startswith('  E'):
+            supported_formats.append(line.split()[1])
+    return supported_formats
 
 
 def get_rgb_map_from_image(img_obj):
@@ -83,27 +93,61 @@ def get_rgb_map_from_image(img_obj):
     return rgb_map
 
 
-def process_video(path, resolution=(30, 18), fps=30):
+def process_video(path, outdir=None, resolution=(30, 18), fps=30, **kwargs):
     """ Fully process a video or directory of videos into Nightlight format
 
     Scale the video to the appropriate resolution, convert it to frames, and then parse the RGB
     values from each frame.
 
-    :param path: Either a path to an input video file or a directory of video files.
-    :param resolution: Resolution (in pixels) to scale the video to.
-    :param fps: Frames per second to use.
+    :param str path: Either a path to an input video file or a directory of video files.
+    :param str outdir: Output directory path. If None, output will be saved to the input
+                       directory.
+    :param tuple resolution: Resolution in pixels to scale the video to (width, height).
+    :param int fps: Frames per second to use.
+    :param kwargs: Any valid arguments to scale_video().
     """
-    if isinstance(path, str) and os.path.isdir(path):
-        pass
-    elif isinstance(path, str) and os.path.exists(path):
-        videos = [path]
-    else:
-        raise TypeError('Input must be either a video file or a directory of video files')
+    def create_outdir(video, outdir):
+        basedir = os.path.dirname(video)
+        basename = os.path.basename(video)
+        if outdir is None:
+            video_outdir = os.path.join(basedir, os.path.splitext(basename)[0])
+        else:
+            video_outdir = os.path.join(outdir, os.path.splitext(basename)[0])
+        if not os.path.exists(video_outdir):
+            os.mkdir(video_outdir)
+        return video_outdir
 
+    def validate_input(path):
+        valid_extensions = get_ffmpeg_supported_formats()
+        if isinstance(path, str) and os.path.isdir(path):
+            videos = [os.path.join(path, x) for x in os.listdir(path) if x.endswith(tuple(valid_extensions))]
+        elif isinstance(path, str) and os.path.exists(path):
+            videos = [path] if path.endswith(tuple(valid_extensions)) else []
+        else:
+            raise TypeError('Input must be either a video file or a directory of video files')
+        if not videos:
+            raise ValueError('Input does not include any video files with recognized extensions'
+                             ' ({})'.format(valid_extensions))
+        return videos
+
+    videos = validate_input(path)
     for video in videos:
-        basedir = os.path.dirname(path)
-        out
+        video_outdir = create_outdir(video, outdir)
+        video_filename = os.path.basename(video)
 
+        # Scale the video.
+        scaled_filename = '{}_({}x{}).{}'.format(os.path.splitext(video_filename)[0], resolution[0],
+                                                 resolution[1], os.path.splitext(video_filename)[1])
+        scaled_video = os.path.join(video_outdir, scaled_filename)
+        scale_video(video, scaled_video, resolution, **kwargs)
+
+        # Convert the video to frames.
+        frames_outdir = os.path.join(video_outdir, 'frames')
+        convert_video_to_frames(scaled_video, frames_outdir, fps)
+
+        # Convert the frames to a Nightlight file.
+        nightlight_filename = '{}.nl'.format(os.path.splitext(video_filename)[0])
+        convert_frames_to_file(frames_outdir, os.path.join(video_outdir, nightlight_filename))
 
 
 def scale_video(infile, outfile, resolution=(30, 18), method='bicubic', contrast=1.0,
