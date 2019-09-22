@@ -117,16 +117,31 @@ def process_video(path, resolution=(30, 18), fps=30):
 
 
 
-def scale_video(infile, outfile, resolution=(30, 18)):
+def scale_video(infile, outfile, resolution=(30, 18), method='bicubic', contrast=1.0,
+                brightness=0.0, saturation=1.0, gamma=1.0):
     """ Scale a video using ffmpeg
 
-    This function requires that ffmpeg by available on the system path.
+    You can choose a specific scaling method and apply equalizer adjustments such as contrast,
+    brightness, and saturation to tune the appearance of the output video.
 
-    :param infile: Input video file path.
-    :param outfile: Output video file path.
-    :param resolution: Resolution (in pixels) to scale the video to.
+    This function requires that ffmpeg by available on the system path, and, if built from
+    source, configured using the --enable-gpl flag.
+
+    See ffmpeg scaler options here: https://ffmpeg.org/ffmpeg-scaler.html#scaler_005foptions
+    See ffmpeg filter options here: https://ffmpeg.org/ffmpeg-filters.html#eq
+
+    :param str infile: Input video file path.
+    :param str outfile: Output video file path.
+    :param tuple resolution: Resolution in pixels to scale the video to (width, height).
+    :param str method: Scaling method to use. Some examples are 'bicubic' and 'neighbor'.
+    :param float contrast: Contrast adjustment factor (-1000.0 to 1000.0).
+    :param float brightness: Brightness adjustment factor (-1.0 to 1.0).
+    :param float saturation: Saturation adjustment factor (0.0 to 3.0).
+    :param float gamma: Gamma adjustment factor (0.1 to 10.0).
     """
-    cmd = f'ffmpeg -i {infile} -vf scale={resolution[0]}:{resolution[1]} {outfile}'
+    cmd = (f'ffmpeg -i {infile} -vf scale={resolution[0]}:{resolution[1]}:flags={method},'
+           f'eq=contrast={contrast}:brightness={brightness}:saturation={saturation}:gamma={gamma}'
+           f' -y {outfile}')
     print(cmd)
     output = subprocess.check_output(cmd.split())
     print(output)
