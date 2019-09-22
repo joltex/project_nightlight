@@ -8,7 +8,9 @@ read by the Nightlight.
 import json
 import os
 import subprocess
-from PIL import Image, GifImagePlugin
+from PIL import Image
+
+DEFAULT_RESOLUTION = (30, 18)
 
 
 def main():
@@ -93,7 +95,7 @@ def get_rgb_map_from_image(img_obj):
     return rgb_map
 
 
-def process_video(path, outdir=None, resolution=(30, 18), fps=30, **kwargs):
+def process_video(path, outdir=None, resolution=DEFAULT_RESOLUTION, fps=30, **kwargs):
     """ Fully process a video or directory of videos into Nightlight format
 
     Scale the video to the appropriate resolution, convert it to frames, and then parse the RGB
@@ -150,8 +152,8 @@ def process_video(path, outdir=None, resolution=(30, 18), fps=30, **kwargs):
         convert_frames_to_file(frames_outdir, os.path.join(video_outdir, nightlight_filename))
 
 
-def scale_video(infile, outfile, resolution=(30, 18), method='bicubic', contrast=1.0,
-                brightness=0.0, saturation=1.0, gamma=1.0):
+def scale_video(infile, outfile, resolution=DEFAULT_RESOLUTION, scale_method='bicubic',
+                contrast=1.0, brightness=0.0, saturation=1.0, gamma=1.0):
     """ Scale a video using ffmpeg
 
     You can choose a specific scaling method and apply equalizer adjustments such as contrast,
@@ -166,13 +168,13 @@ def scale_video(infile, outfile, resolution=(30, 18), method='bicubic', contrast
     :param str infile: Input video file path.
     :param str outfile: Output video file path.
     :param tuple resolution: Resolution in pixels to scale the video to (width, height).
-    :param str method: Scaling method to use. Some examples are 'bicubic' and 'neighbor'.
+    :param str scale_method: Scaling method to use. Some examples are 'bicubic' and 'neighbor'.
     :param float contrast: Contrast adjustment factor (-1000.0 to 1000.0).
     :param float brightness: Brightness adjustment factor (-1.0 to 1.0).
     :param float saturation: Saturation adjustment factor (0.0 to 3.0).
     :param float gamma: Gamma adjustment factor (0.1 to 10.0).
     """
-    cmd = (f'ffmpeg -i {infile} -vf scale={resolution[0]}:{resolution[1]}:flags={method},'
+    cmd = (f'ffmpeg -i {infile} -vf scale={resolution[0]}:{resolution[1]}:flags={scale_method},'
            f'eq=contrast={contrast}:brightness={brightness}:saturation={saturation}:gamma={gamma}'
            f' -y {outfile}')
     print(cmd)
