@@ -26,22 +26,20 @@ def convert_frames_to_file(frames, outfile):
                    order is expected to match the order of the list elements.
     :param outfile: Output file path.
     """
-    def validate_input(frames):
-        valid_extensions = ['.png', '.jpg']
-        if isinstance(frames, str) and os.path.isdir(frames):
-            files = [x for x in os.listdir(frames) if x.endswith(tuple(valid_extensions))]
-            files.sort()
-            image_objs = [Image.open(os.path.join(frames, x)) for x in files]
-        elif isinstance(frames, list):
-            if not all(isinstance(x, Image.Image) for x in frames):
-                raise TypeError('frames must be a directory or a list of Pillow Image objects.')
-            image_objs = frames
-        else:
-            raise TypeError('frames must be a directory or a list of Pillow Image objects.')
-        return image_objs
+    valid_extensions = ['.png', '.jpg']
+    if isinstance(frames, str) and os.path.isdir(frames):
+        files = [x for x in os.listdir(frames) if x.endswith(tuple(valid_extensions))]
+        files.sort()
+        rgb_map = [get_rgb_map_from_image(Image.open(os.path.join(frames, x))) for x in files]
 
-    image_objs = validate_input(frames)
-    rgb_map = [get_rgb_map_from_image(x) for x in image_objs]
+    elif isinstance(frames, list):
+        if not all(isinstance(x, Image.Image) for x in frames):
+            raise TypeError('frames must be a directory or a list of Pillow Image objects.')
+        rgb_map = [get_rgb_map_from_image(x) for x in frames]
+
+    else:
+        raise TypeError('frames must be a directory or a list of Pillow Image objects.')
+
     write_rgb_map_to_file(rgb_map, outfile)
 
 
@@ -116,7 +114,7 @@ def process_video(path, outdir=None, resolution=DEFAULT_RESOLUTION, fps=30, **kw
         else:
             video_outdir = os.path.join(outdir, os.path.splitext(basename)[0])
         if not os.path.exists(video_outdir):
-            os.mkdir(video_outdir)
+            os.makedirs(video_outdir)
         return video_outdir
 
     def validate_input(path):
@@ -138,7 +136,7 @@ def process_video(path, outdir=None, resolution=DEFAULT_RESOLUTION, fps=30, **kw
         video_filename = os.path.basename(video)
 
         # Scale the video.
-        scaled_filename = '{}_({}x{}).{}'.format(os.path.splitext(video_filename)[0], resolution[0],
+        scaled_filename = '{}_({}x{}){}'.format(os.path.splitext(video_filename)[0], resolution[0],
                                                  resolution[1], os.path.splitext(video_filename)[1])
         scaled_video = os.path.join(video_outdir, scaled_filename)
         scale_video(video, scaled_video, resolution, **kwargs)
