@@ -62,18 +62,7 @@ def convert_video_to_frames(video_file, outdir, fps=30):
     print(output)
 
 
-def get_rgb_map_from_gif(gif_file):
-    # Create an Image object from the gif file.
-    gif_obj = Image.open(gif_file)
-    # gif_obj = gif_obj.convert('RGB')
 
-    # Iterate through each frame of the gif and read the RGB values for each pixel.
-    rgb_map = []
-    for frame in range(0, gif_obj.n_frames):
-        gif_obj.seek(frame)
-        rgb_map.append(get_rgb_map_from_image(gif_obj))
-
-    return rgb_map
 
 
 def get_rgb_map_from_image(img_obj):
