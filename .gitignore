@@ -26,3 +26,6 @@ wheels/
 
 #PyCharm
 .idea/
+
+# vim
+*.swp

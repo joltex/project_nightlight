@@ -1,7 +1,11 @@
+import os
+import argparse
 import board
 import json
-from nightlight import adafruit_dotstar
+from nightlight import base
 import logging
+
+import time
 
 DEFAULT_RESOLUTION = (30, 18)
 
@@ -12,8 +16,11 @@ def main():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('path', help='Path to a nightlight file or directory of nightlight files.')
-    patterns = load_nightlight_files(nighlights_paths)
-    board = Nightlight()
+    parser.add_argument('--frame_rate', type=int, help='Frame rate in frames-per-second.', default=30)
+
+    args = parser.parse_args()
+    patterns = load_nightlight_files(args.path)
+    board = base.Nightlight(max_brightness=0.5, default_frame_rate=args.frame_rate)
     start_the_show(board, patterns)
 
 def get_file_paths(path, valid_extensions=None):
@@ -40,61 +47,16 @@ def load_nightlight_files(path):
     result = []
     for file_path in paths:
         try:
-            result.append(json.load(file_path))
+            with open(file_path, 'r') as file_handler:
+                result.append(json.load(file_handler))
         except:
-            logging.error("Could not load nightlight file %r", path)
+            logging.error("Could not load nightlight file %r", file_path)
     return result
 
 
-def start_the_show(patterns, board):
+def start_the_show(board, patterns):
     while 1:
         for pattern in patterns:
+            board._write_colour((0, 0, 0))
             board.write_pattern(pattern)
-
-class Nightlight:
-
-    def __init__(self, resolution=DEFAULT_RESOLUTION, clock_pin=board.SCK, data_pin=board.MOSI,
-                 baudrate=4000000):
-        self._width = resolution[0]
-        self._height = resolution[1]
-        self._board = adafruit_dotstar.DotStar(
-            clock_pin,
-            data_pin,
-            n=self._width * self._height,
-            baudrate=baudrate)
-
-    def write_pattern(self, pattern):
-        """ Write a nightlight pattern to the board.
-
-        :param pattern: Nighlight pattern to write to the board
-        """
-        for y, row in enumerate(pattern):
-            for x, pixel in enumerate(row):
-                self._write_pixel(x, y, pixel)
-
-    def _write_pixel(self, x, y, colour):
-        """ Write a single pixel to its x, and y coordinate.
-
-        Since the board is wired_up in an "S" pattern, every odd row goes in the opposite
-        direction:
-           > > > > > > ↓
-         ↓ < < < < < <
-           > > > > > > ↓
-              ...
-
-        :param x: `x` coordinate of pixel to write
-        :param y: `y` coordinate of pixel to write
-        :param colour: RGB tuple of colour to write
-        """
-        if not y % 2:
-            x = self._width - x
-        pixel_number = y * self._height + x
-        self._board[pixel_number] = tuple(colour)
-
-    def _write_colour(self, colour):
-        """ Write a single colour to the whole board
-
-        :param colour: RGB colour to write to the board.
-        """
-        self._board.fill(colour)
-
+            print("finished pattern")
