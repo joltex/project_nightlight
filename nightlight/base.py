@@ -1,7 +1,10 @@
+import time
+
 import board
 
 from nightlight import adafruit_dotstar
 
+DEFAULT_RESOLUTION = (30, 18)
 
 class Nightlight:
 

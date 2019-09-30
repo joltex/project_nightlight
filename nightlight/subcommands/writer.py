@@ -1,8 +1,11 @@
-import json
-import logging
 import os
-
+import argparse
+import board
+import json
 from nightlight import base
+import logging
+
+import time
 
 DEFAULT_RESOLUTION = (30, 18)
 
@@ -51,3 +54,4 @@ def start_the_show(board, patterns):
         for pattern in patterns:
             board._write_colour((0, 0, 0))
             board.write_pattern(pattern)
+            print("finished pattern")

@@ -5,14 +5,9 @@ which store the RGB values for each pixel in each frame of a video. These files 
 read by the Nightlight.
 
 """
-from __future__ import unicode_literals
-
 import json
 import os
 import subprocess
-import youtube_dl
-import tempfile
-
 from PIL import Image
 
 DEFAULT_RESOLUTION = (30, 18)
@@ -22,17 +17,8 @@ def main(args):
     """
     Commandline entrypoint - parses args and calls process_video().
     """
-    filtered_args = {key: value
-                     for key, value in vars(args).items()
-                     if value is not None and key is not 'func'}
+    filtered_args = {key: value for key, value in vars(args).items() if value is not None}
 
-    if args.path.startswith('http') or args.path.startswith('www'):
-        path = download_video(filtered_args['path'])
-        filtered_args['path'] = path + ".mkv" 
-        if not 'outdir' in filtered_args:
-            filtered_args['outdir'] = '~/Downloads/'
-
-    print(filtered_args)
     if 'resolution' in filtered_args:
         try:
             parsed_resolution = filtered_args['resolution'].lower().split('x')
@@ -44,15 +30,7 @@ def main(args):
             raise ValueError('Unable to parse resolution "{}". Must be in the format width'
                              ' x height - eg 30x18.'.format(filtered_args['resolution']))
 
-
     process_video(**filtered_args)
-
-def download_video(url):
-    temp_directory = tempfile.mkdtemp(prefix='nightlight')
-    params = {'outtmpl': temp_directory}
-    with youtube_dl.YoutubeDL(params) as ydl:
-            print(ydl.download([url]))
-    return temp_directory
 
 
 def convert_frames_to_file(frames, outfile):
@@ -145,8 +123,6 @@ def process_video(path, outdir=None, resolution=DEFAULT_RESOLUTION, fps=30, **kw
     :param kwargs: Any valid arguments to scale_video().
     """
     def create_outdir(video, outdir):
-        print(video)
-        print(outdir)
         basedir = os.path.dirname(video)
         basename = os.path.basename(video)
         if outdir is None:
@@ -159,18 +135,15 @@ def process_video(path, outdir=None, resolution=DEFAULT_RESOLUTION, fps=30, **kw
 
     def validate_input(path):
         valid_extensions = get_ffmpeg_supported_formats()
-        valid_extensions = [""]
         if isinstance(path, str) and os.path.isdir(path):
             videos = [os.path.join(path, x) for x in os.listdir(path) if x.endswith(tuple(valid_extensions))]
         elif isinstance(path, str) and os.path.exists(path):
             videos = [path] if path.endswith(tuple(valid_extensions)) else []
-        """
         else:
             raise TypeError('Input must be either a video file or a directory of video files')
         if not videos:
             raise ValueError('Input does not include any video files with recognized extensions'
                              ' ({})'.format(valid_extensions))
-        """
         return videos
 
     videos = validate_input(path)
