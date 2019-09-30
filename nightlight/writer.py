@@ -1,24 +1,16 @@
-import os
-import argparse
-import board
 import json
-from nightlight import base
 import logging
+import os
 
-import time
+from nightlight import base
 
 DEFAULT_RESOLUTION = (30, 18)
 
 
-def main():
+def main(args):
     """
-    Commandline entrypoint -
+    Commandline entrypoint - Play function
     """
-    parser = argparse.ArgumentParser()
-    parser.add_argument('path', help='Path to a nightlight file or directory of nightlight files.')
-    parser.add_argument('--frame_rate', type=int, help='Frame rate in frames-per-second.', default=30)
-
-    args = parser.parse_args()
     patterns = load_nightlight_files(args.path)
     board = base.Nightlight(max_brightness=0.5, default_frame_rate=args.frame_rate)
     start_the_show(board, patterns)
@@ -59,4 +51,3 @@ def start_the_show(board, patterns):
         for pattern in patterns:
             board._write_colour((0, 0, 0))
             board.write_pattern(pattern)
-            print("finished pattern")
