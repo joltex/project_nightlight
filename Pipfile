@@ -7,7 +7,6 @@ verify_ssl = true
 
 [packages]
 project-nightlight = {editable = true,path = "."}
-pillow = "*"
 
 [requires]
 python_version = "3.7"
