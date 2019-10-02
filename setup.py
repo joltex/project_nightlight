@@ -8,6 +8,7 @@ setup(
     install_requires=[
         'adafruit-circuitpython-lis3dh',
         'pillow',
+        'youtube-dl'
     ],
     entry_points={'console_scripts': ['nightlight=nightlight.cli:main']},
     url='https://github.com/joltex/project_nightlight',
