@@ -1,40 +1,45 @@
+""" base.py
+
+This module contains the Nightlight class, which represents the actual Nightlight board and
+associated methods for writing pixels and playing patterns.
+
+"""
 import time
 
-import board
+try:
+    import board
+except NotImplementedError:
+    # If you try to import 'board' on a PC, it will fail to detect a recognized board and raise
+    # an exception. If this happens, create a mock board object so that at least the converter
+    # module can be run.
+    print('WARNING: No valid board (Raspberry Pi, Arduino, etc.) detected. You will not'
+          ' be able to play anything.')
+    from unittest.mock import Mock
+    board = Mock(['SCK', 'MOSI'])
 
 from nightlight import adafruit_dotstar
 
-DEFAULT_RESOLUTION = (30, 18)
 
 class Nightlight:
 
-    def __init__(
-            self,
-            resolution=DEFAULT_RESOLUTION,
-            clock_pin=board.SCK,
-            data_pin=board.MOSI,
-            baudrate=4000000,
-            max_brightness=1.0,
-            default_frame_rate=30):
-        self._width = resolution[0]
-        self._height = resolution[1]
-        self._board = adafruit_dotstar.DotStar(
-            clock_pin,
-            data_pin,
-            n=self._width * self._height,
-            baudrate=baudrate,
-            pixel_order=(0,1,2),
-            auto_write=False)
-        self._frame_rate = default_frame_rate
+    def __init__(self, width=30, height=18, clock_pin=board.SCK, data_pin=board.MOSI,
+                 baudrate=4000000, max_brightness=1.0, default_frame_rate=30):
+        self._width = width
+        self._height = height
         self._max_brightness = max_brightness
+        self._default_frame_rate = default_frame_rate
+        self._leds = adafruit_dotstar.DotStar(clock_pin, data_pin, n=(self._width * self._height),
+                                              baudrate=baudrate, pixel_order=adafruit_dotstar.RGB,
+                                              auto_write=False)
 
     def write_pattern(self, pattern, frame_rate=None):
-        """ Write a nightlight pattern to the board.
+        """ Write a pattern to the Nightlight
 
-        :param pattern: Nightlight pattern to write to the board
+        :param pattern: Nightlight pattern to write.
+        :param frame_rate: Frame rate in frames per second.
         """
         if frame_rate is None:
-            frame_rate = self._frame_rate
+            frame_rate = self._default_frame_rate
         time_per_frame = 1.0 / frame_rate
 
         last_frame = time.time()
@@ -42,7 +47,7 @@ class Nightlight:
             for y, row in enumerate(frame):
                 for x, pixel in enumerate(row):
                     self._write_pixel(x, y, pixel)
-            self._board.show()
+            self._leds.show()
             self._sleep_frame(last_frame, time_per_frame)
             last_frame = time.time()
 
@@ -78,7 +83,7 @@ class Nightlight:
             x = self._width - x
         pixel_number = y * self._height + x
         pixel = self._calculate_pixel(colour)
-        self._board[pixel_number] = pixel
+        self._leds[pixel_number] = pixel
 
     def _calculate_pixel(self, colour):
         brightness = self._calculate_brightness(colour)
@@ -110,4 +115,4 @@ class Nightlight:
 
         :param colour: RGB colour to write to the board.
         """
-        self._board.fill(colour)
+        self._leds.fill(colour)
