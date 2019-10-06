@@ -67,5 +67,5 @@ def start_the_show(board, patterns):
     """
     while 1:
         for pattern in patterns:
-            board._write_colour((0, 0, 0))
-            board.write_pattern(pattern)
+            board.write_colour((0, 0, 0))
+            board.play_pattern(pattern)

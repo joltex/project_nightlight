@@ -32,7 +32,7 @@ class Nightlight:
                                               baudrate=baudrate, pixel_order=adafruit_dotstar.RGB,
                                               auto_write=False)
 
-    def write_pattern(self, pattern, frame_rate=None):
+    def play_pattern(self, pattern, frame_rate=None):
         """ Write a pattern to the Nightlight
 
         :param pattern: Nightlight pattern to write.
@@ -110,7 +110,7 @@ class Nightlight:
                 0.7152 * colour[1] +
                 0.0722 * colour[2]) / (100 * self._max_brightness)
 
-    def _write_colour(self, colour):
+    def write_colour(self, colour):
         """ Write a single colour to the whole board
 
         :param colour: RGB colour to write to the board.
