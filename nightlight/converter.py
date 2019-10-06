@@ -14,26 +14,6 @@ from PIL import Image
 DEFAULT_RESOLUTION = (30, 18)
 
 
-def main(args):
-    """
-    Commandline entrypoint - parses args and calls process_video().
-    """
-    filtered_args = {key: value for key, value in vars(args).items() if value is not None}
-
-    if 'resolution' in filtered_args:
-        try:
-            parsed_resolution = filtered_args['resolution'].lower().split('x')
-            parsed_resolution = tuple(map(int, parsed_resolution))
-            if len(parsed_resolution) != 2:
-                raise ValueError()
-            filtered_args['resolution'] = parsed_resolution
-        except:
-            raise ValueError('Unable to parse resolution "{}". Must be in the format width'
-                             ' x height - eg 30x18.'.format(filtered_args['resolution']))
-
-    process_video(**filtered_args)
-
-
 def convert_frames_to_file(frames, outfile):
     """ Convert a collection of video frames to a Nightlight file
 
