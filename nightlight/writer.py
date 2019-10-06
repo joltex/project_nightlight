@@ -7,14 +7,7 @@ from nightlight import base
 DEFAULT_RESOLUTION = (30, 18)
 
 
-def main(args):
     """
-    Commandline entrypoint - Play function
-    """
-    patterns = load_nightlight_files(args.path)
-    board = base.Nightlight(max_brightness=0.5, default_frame_rate=args.frame_rate)
-    start_the_show(board, patterns)
-
 def get_file_paths(path, valid_extensions=None):
     if valid_extensions is None:
         valid_extensions = [""]
@@ -44,6 +37,18 @@ def load_nightlight_files(path):
         except:
             logging.error("Could not load nightlight file %r", file_path)
     return result
+
+
+def play_nightlight_files(path, max_brightness=1.0, frame_rate=30):
+    """ Play a Nightlight file or directory of Nightlight files
+
+    :param path: Path to a Nightlight file or directory of Nightlight files.
+    :param max_brightness: The maximum global brightness during playback.
+    :param frame_rate: The frame rate to use in frames per second.
+    """
+    patterns = load_nightlight_files(path)
+    board = base.Nightlight(max_brightness=max_brightness, default_frame_rate=frame_rate)
+    start_the_show(board, patterns)
 
 
 def start_the_show(board, patterns):
