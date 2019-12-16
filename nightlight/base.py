@@ -5,6 +5,7 @@ associated methods for writing pixels and playing patterns.
 
 """
 import time
+from typing import Tuple
 
 try:
     import board
@@ -52,7 +53,7 @@ class Nightlight:
             last_frame = time.time()
 
     def _sleep_frame(self, last_frame, time_per_frame):
-        """ Sleep between frames to write to the board at a correct frame rate.
+        """ Sleep between frames to write to the board at a correct frame rate
 
         :param last_frame: Timestamp of when the last frame was written.
         :param time_per_frame: The total time to wait on each frame.
@@ -62,26 +63,25 @@ class Nightlight:
         if time_to_wait > 0:
             time.sleep(time_to_wait)
 
-    def _write_pixel(self, x, y, colour):
-        """ Write a single pixel to its x, and y coordinate.
+    def _write_pixel(self, x: int, y: int, colour: Tuple[int, int, int]):
+        """ Write a single pixel to its x and y coordinate
 
-        Since the board is wired_up in an "S" pattern, every odd row goes in the opposite
-        direction:
-
+        This requires converting the x, y coordinate to an absolute pixel number. Since
+        the board is wired up in an "S" pattern, pixel number ascends from left to right
+        on every even row and from right to left on every odd row:
 
                > > > > > > ↓
              ↓ < < < < < <
                > > > > > > ↓
                   ...
 
-
-        :param x: `x` coordinate of pixel to write
-        :param y: `y` coordinate of pixel to write
-        :param colour: RGB tuple of colour to write
+        :param x: The x coordinate of the pixel to write.
+        :param y: The y coordinate of the pixel to write
+        :param colour: RGB tuple of colour to write.
         """
-        if not y % 2:
+        if y % 2:
             x = self._width - x
-        pixel_number = y * self._height + x
+        pixel_number = y * self._width + x
         pixel = self._calculate_pixel(colour)
         self._leds[pixel_number] = pixel
 
@@ -90,10 +90,10 @@ class Nightlight:
         return tuple(colour) + (brightness,)
 
     def _calculate_brightness(self, colour):
-        """ Calculate the brightness of each pixel.
+        """ Calculate the brightness of a pixel
 
-        The brighness of each pixel should vary with depending on the RGB value
-        of the colour.  Sending (100, 100, 100) should be a much more dim than
+        The brightness of each pixel should vary depending on the RGB value
+        of the colour.  Sending (100, 100, 100) should be much more dim than
         what is sent by default.
 
         The formula used here was taken from:
