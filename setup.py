@@ -7,7 +7,11 @@ setup(
     include_package_data=True,
     install_requires=[
         'adafruit-circuitpython-lis3dh',
+        'matplotlib',
+        'noise',
+        'numpy',
         'pillow',
+        'scikit-image',
         'youtube-dl'
     ],
     entry_points={'console_scripts': ['nightlight=nightlight.cli:main']},
