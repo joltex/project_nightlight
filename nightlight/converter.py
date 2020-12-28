@@ -8,7 +8,9 @@ read by the Nightlight.
 import json
 import os
 import subprocess
+from typing import List, Optional, Tuple
 
+import numpy as np
 from PIL import Image
 
 DEFAULT_RESOLUTION = (30, 18)
@@ -215,3 +217,56 @@ def write_rgb_array_to_file_pretty(rgb_array, outfile):
             for row in frame:
                 json.dump(row, fout)
                 fout.write('\n')
+
+
+def write_rgb_array_to_gif(rgb_array: np.ndarray, outfile: str,
+                           colour_mode: str = 'RGB', scale: int = 5,
+                           fps: int = 30, padding: Optional[int] = None):
+    """ Write an array of RGB values to a gif file
+
+    :param rgb_array: RGB array data structure - nested list where 1st level = frames
+                      of a video, 2nd level = rows of a frame, 3rd level = RGB values
+                      of a row.
+    :param outfile: Output file path.
+    :param colour_mode: 'L' if values in `rgb_array` are single uint8 / black and white
+                        values from 0-255. 'RGB' if values in `rgb_array` are uint8 RGB
+                        tuples (0-255, 0-255, 0-255).
+    :param scale: Scaling factor to apply.
+    :param fps: Frames per second to use in exported gif.
+    :param padding: If supplied, insert this many pixels of black space between each
+                    pixel to simulate the appearance of patterns on the board.
+    """
+
+    def add_padding(frames: np.ndarray, n: int = 1) -> np.ndarray:
+        """ Mock the appearance of patterns on the board by inserting black pixels
+            (zeros) between each row and each column of each frame
+
+        :param frames: Array of pattern frames.
+        :param n: Number of rows/columns of zeros to insert between each existing
+                  row and column.
+        :return: Input frames with zeroes added.
+        """
+        # Initialize array of zeros
+        zeros_shape = [frames.shape[0],
+                       ((n + 1) * frames.shape[1] - n),
+                       ((n + 1) * frames.shape[2] - n)]
+        if len(frames.shape) == 4:  # if this is an RGB array we need an extra dimension
+            zeros_shape.append(frames.shape[3])
+        new_frames = np.zeros(tuple(zeros_shape), dtype=frames.dtype)
+        # Splice in the original data
+        for i, f in enumerate(frames):
+            new_frames[i][::n + 1, ::n + 1] = f
+        return new_frames
+
+    if padding:
+        rgb_array = add_padding(rgb_array, padding)
+    # Convert each frame of the pattern to a PIL image and scale.
+    images = [Image.fromarray(np.uint8(frame), mode=colour_mode)
+              .resize((frame.shape[1] * scale, frame.shape[0] * scale))
+              for frame in rgb_array]
+    # For RGB patterns, need to map the images to a palette otherwise the gif looks whack.
+    if colour_mode == 'RGB':
+        images = [image.convert('P', palette=Image.ADAPTIVE)
+                  for image in images]
+
+    images[0].save(outfile, save_all=True, append_images=images[1:], duration=1/fps*100)
