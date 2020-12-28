@@ -37,7 +37,7 @@ def convert_frames_to_file(frames, outfile):
     else:
         raise TypeError('frames must be a directory or a list of Pillow Image objects.')
 
-    write_rgb_map_to_file(rgb_map, outfile)
+    write_rgb_array_to_file(rgb_map, outfile)
 
 
 def convert_video_to_frames(video_file, outdir, fps=30):
@@ -177,24 +177,24 @@ def scale_video(infile, outfile, resolution=DEFAULT_RESOLUTION, scale_method='bi
     print(output)
 
 
-def write_rgb_map_to_file(rgb_map, outfile, pretty=False):
-    """ Write an RGB map to a text file
+def write_rgb_array_to_file(rgb_array, outfile, pretty=False):
+    """ Write an array of RGB values to a text file
 
-    :param rgb_map: RGB map data structure - nested list where 1st level = frames of a video,
+    :param rgb_array: RGB array - nested list where 1st level = frames of a video,
                     2nd level = rows of a frame, 3rd level = RGB values of a row.
     :param outfile: Output file path.
     :param pretty: If True, write the RGB map to the file using newlines to separate each row of
                    each frame.
     """
     if pretty:
-        write_rgb_map_to_file_pretty(rgb_map, outfile)
+        write_rgb_array_to_file_pretty(rgb_array, outfile)
     else:
         with open(outfile, 'w') as fout:
-            json.dump(rgb_map, fout)
+            json.dump(rgb_array, fout)
 
 
-def write_rgb_map_to_file_pretty(rgb_map, outfile):
-    """ Write an RGB map to a text file in a human-readable format
+def write_rgb_array_to_file_pretty(rgb_array, outfile):
+    """ Write an array of RGB values to a text file in a human-readable format
 
     Output format:
         # Frame 1
@@ -204,12 +204,13 @@ def write_rgb_map_to_file_pretty(rgb_map, outfile):
         [(56, 23, 0), (255, 66, 120)]
         ...
 
-    :param rgb_map: RGB map data structure - nested list where 1st level = frames of a video,
-                    2nd level = rows of a frame, 3rd level = RGB values of a row.
+    :param rgb_array: RGB array data structure - nested list where 1st level = frames
+                      of a video, 2nd level = rows of a frame, 3rd level = RGB values
+                      of a row.
     :param outfile: Output file path.
     """
     with open(outfile, 'w') as fout:
-        for i, frame in enumerate(rgb_map):
+        for i, frame in enumerate(rgb_array):
             fout.write(f'# Frame {i+1}\n')
             for row in frame:
                 json.dump(row, fout)
