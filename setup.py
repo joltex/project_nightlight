@@ -6,12 +6,12 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
+        'adafruit-blinka==5.9.2',
         'adafruit-circuitpython-lis3dh',
         'matplotlib',
         'noise',
         'numpy',
         'pillow',
-        'scikit-image',
         'youtube-dl'
     ],
     entry_points={'console_scripts': ['nightlight=nightlight.cli:main']},
