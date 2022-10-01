@@ -80,7 +80,7 @@ class Nightlight:
         :param colour: RGB tuple of colour to write.
         """
         if y % 2:
-            x = self._width - x
+            x = self._width - x - 1
         pixel_number = y * self._width + x
         pixel = self._calculate_pixel(colour)
         self._leds[pixel_number] = pixel
