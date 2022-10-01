@@ -28,7 +28,7 @@ def convert_frames_to_file(frames, outfile):
     valid_extensions = ['.png', '.jpg']
     if isinstance(frames, str) and os.path.isdir(frames):
         files = [x for x in os.listdir(frames) if x.endswith(tuple(valid_extensions))]
-        files.sort()
+        files.sort(key=lambda x: int(x.split('.')[0]))
         rgb_map = [get_rgb_map_from_image(Image.open(os.path.join(frames, x))) for x in files]
 
     elif isinstance(frames, list):
@@ -258,6 +258,7 @@ def write_rgb_array_to_gif(rgb_array: np.ndarray, outfile: str,
             new_frames[i][::n + 1, ::n + 1] = f
         return new_frames
 
+    rgb_array = np.array(rgb_array)
     if padding:
         rgb_array = add_padding(rgb_array, padding)
     # Convert each frame of the pattern to a PIL image and scale.
