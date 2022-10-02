@@ -54,9 +54,12 @@ def play_nightlight_files(path, max_brightness=1.0, frame_rate=30):
     :param max_brightness: The maximum global brightness during playback.
     :param frame_rate: The frame rate to use in frames per second.
     """
-    patterns = load_nightlight_files(path)
-    board = base.Nightlight(max_brightness=max_brightness, default_frame_rate=frame_rate)
-    start_the_show(board, patterns)
+    try:
+        patterns = load_nightlight_files(path)
+        board = base.Nightlight(max_brightness=max_brightness, default_frame_rate=frame_rate)
+        start_the_show(board, patterns)
+    except KeyboardInterrupt as err:
+        board.write_colour((0,0,0))
 
 
 def start_the_show(board, patterns):
