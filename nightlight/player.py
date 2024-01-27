@@ -57,18 +57,6 @@ def play_nightlight_files(path, max_brightness=1.0, frame_rate=30):
     try:
         patterns = load_nightlight_files(path)
         board = base.Nightlight(max_brightness=max_brightness, default_frame_rate=frame_rate)
-        start_the_show(board, patterns)
+        board.play_patterns(patterns)
     except KeyboardInterrupt as err:
-        board.write_colour((0,0,0))
-
-
-def start_the_show(board, patterns):
-    """ Play one or more Nightlight patterns in a loop on the board
-
-    :param board: Nightlight object to play on.
-    :param patterns: List of patterns to play.
-    """
-    while 1:
-        for pattern in patterns:
-            board.write_colour((0, 0, 0))
-            board.play_pattern(pattern)
+        board.write_colour((0, 0, 0))

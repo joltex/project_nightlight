@@ -4,6 +4,8 @@ This module contains the Nightlight class, which represents the actual Nightligh
 associated methods for writing pixels and playing patterns.
 
 """
+from __future__ import annotations
+
 import time
 from typing import Tuple
 
@@ -32,6 +34,12 @@ class Nightlight:
         self._leds = adafruit_dotstar.DotStar(clock_pin, data_pin, n=(self._width * self._height),
                                               baudrate=baudrate, pixel_order=adafruit_dotstar.RGB,
                                               auto_write=False)
+
+    def play_patterns(self, patterns: list[list[list[int]]]):
+        while 1:    
+            for pattern in patterns:
+                self.write_colour((0, 0, 0))
+                self.play_pattern(pattern)
 
     def play_pattern(self, pattern, frame_rate=None):
         """ Write a pattern to the Nightlight
