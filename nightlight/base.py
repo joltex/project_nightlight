@@ -116,3 +116,4 @@ class Nightlight:
         :param colour: RGB colour to write to the board.
         """
         self._leds.fill(colour)
+        self._leds.show()
