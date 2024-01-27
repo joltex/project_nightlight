@@ -8,6 +8,7 @@ setup(
     install_requires=[
         'adafruit-blinka==5.9.2',
         'adafruit-circuitpython-lis3dh',
+        'attrs',
         'matplotlib',
         'noise',
         'numpy',
