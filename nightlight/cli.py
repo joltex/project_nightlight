@@ -3,7 +3,7 @@
 """
 import argparse
 
-from nightlight import converter, player
+from nightlight import base, converter, player
 
 
 def main():
@@ -12,10 +12,13 @@ def main():
     """
     parser = argparse.ArgumentParser(prog='nightlight')
     subparsers = parser.add_subparsers(title='commands', dest='command')
+    configure_clear_parser(subparsers)
     configure_convert_parser(subparsers)
     configure_play_parser(subparsers)
 
     args = parser.parse_args()
+    if args.command == 'clear':
+        base.Nightlight().write_colour((0, 0, 0))
     if args.command == 'convert':
         converter.process_video(args.path, args.outdir, resolution=(args.width, args.height),
                                 fps=args.fps, scale_method=args.scale_method,
@@ -23,6 +26,14 @@ def main():
                                 saturation=args.saturation, gamma=args.gamma)
     elif args.command == 'play':
         player.play_nightlight_files(args.path, args.max_brightness, args.frame_rate)
+
+
+def configure_clear_parser(subparsers):
+    """ Add the 'convert' arguments to an ArgumentParser object's subparsers
+
+    :param subparsers: The argparse subparsers object to add the arguments to.
+    """
+    clear_parser = subparsers.add_parser('clear', help='Turn off all the lights.')
 
 
 def configure_convert_parser(subparsers):
