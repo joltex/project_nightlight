@@ -68,7 +68,9 @@ def play_nightlight_files(path, max_brightness=1.0, frame_rate=30):
             command = input("Enter command: ")
             queue.put(command)
             if command == "exit":
-                board.write_colour((0, 0, 0))
                 break
     except KeyboardInterrupt as err:
+        pass
+    finally:
+        p.terminate()
         board.write_colour((0, 0, 0))
