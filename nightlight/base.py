@@ -58,7 +58,10 @@ class Nightlight:
         for frame in pattern:
             if not self.queue.empty():
                 command = self.queue.get()
-                print(f"YOU ENTERED THE COMMAND {command}") 
+                if command.startswith("brightness"):
+                    brightness_value = float(command.split("brightness")[1].strip())
+                    print(f"Updating brightness to {brightness_value}")
+                    self._max_brightness = brightness_value
 
             for y, row in enumerate(frame):
                 for x, pixel in enumerate(row):
