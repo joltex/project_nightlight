@@ -7,6 +7,7 @@ associated methods for writing pixels and playing patterns.
 from __future__ import annotations
 
 import time
+from multiprocessing import Queue
 from typing import Tuple
 
 try:
@@ -26,7 +27,8 @@ from nightlight import adafruit_dotstar
 class Nightlight:
 
     def __init__(self, width=30, height=18, clock_pin=board.SCK, data_pin=board.MOSI,
-                 baudrate=4000000, max_brightness=1.0, default_frame_rate=30):
+                 baudrate=4000000, max_brightness=1.0, default_frame_rate=30,
+                 queue: Queue = Queue()):
         self._width = width
         self._height = height
         self._max_brightness = max_brightness
@@ -34,9 +36,10 @@ class Nightlight:
         self._leds = adafruit_dotstar.DotStar(clock_pin, data_pin, n=(self._width * self._height),
                                               baudrate=baudrate, pixel_order=adafruit_dotstar.RGB,
                                               auto_write=False)
+        self.queue = queue
 
     def play_patterns(self, patterns: list[list[list[int]]]):
-        while 1:    
+        while True:
             for pattern in patterns:
                 self.write_colour((0, 0, 0))
                 self.play_pattern(pattern)
@@ -53,6 +56,10 @@ class Nightlight:
 
         last_frame = time.time()
         for frame in pattern:
+            if not self.queue.empty():
+                command = self.queue.get()
+                print(f"YOU ENTERED THE COMMAND {command}") 
+
             for y, row in enumerate(frame):
                 for x, pixel in enumerate(row):
                     self._write_pixel(x, y, pixel)
