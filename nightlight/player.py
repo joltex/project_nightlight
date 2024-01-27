@@ -61,7 +61,7 @@ def play_nightlight_files(path, max_brightness=1.0, frame_rate=30):
         max_brightness=max_brightness,
         default_frame_rate=frame_rate,
         queue=queue)
-    p = Process(target=board.play_patterns, args=(patterns,))
+    p = Process(target=board.play_patterns, args=(patterns,), daemon=True)
     p.start()
     try:
         while True:
