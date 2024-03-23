@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "nightlight"
+version = "0.1.0"
+description = ""
+authors = ["Anders Klaus", "Sean Tycho"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+adafruit-blinka = "5.9.2"
+adafruit-circuitpython-lis3dh = "5.1.13"
+attrs = "^23.2.0"
+noise = "^1.2.2"
+numpy = [    
+    {version = "*", python = "^3.8"},
+    {version = "~1.21.6", python = "=3.7"},
+]
+pillow = "*"
+youtube-dl = "^2021.12.17"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
