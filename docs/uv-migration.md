@@ -1,6 +1,6 @@
 # Migrating Nightlight to uv
 
-Status: **in progress (2026-10-04)**. The Pi has been reflashed to Raspberry Pi OS Lite 64-bit (Trixie, Python 3.13), and `pyproject.toml` + `uv.lock` are on the `use-uv` branch. Still to do: verify on the Pi, README, branch housekeeping (see [Remaining work](#remaining-work)).
+Status: **in progress (2026-10-04)**. The Pi has been reflashed to Raspberry Pi OS Lite 64-bit (Trixie, Python 3.13), and `pyproject.toml` + `uv.lock` are on the `migrate-to-uv-and-python-3-13` branch. Still to do: verify on the Pi, README, branch housekeeping (see [Remaining work](#remaining-work)).
 
 ## Summary
 
@@ -93,7 +93,7 @@ Also: `uv init` wasn't used. It ignores `setup.py`/Pipfile, sets `requires-pytho
 
 ```bash
 cd ~/dev
-git clone -b use-uv git@github.com-sean:joltex/project_nightlight.git
+git clone -b migrate-to-uv-and-python-3-13 git@github.com-sean:joltex/project_nightlight.git
 cd project_nightlight
 uv sync --locked
 uv run nightlight play examples/test_pattern.nl

@@ -222,7 +222,7 @@ Or ask Anders for a fresh public key and append it to `~/.ssh/authorized_keys` o
 mkdir -p ~/dev && cd ~/dev
 git clone git@github.com-sean:joltex/project_nightlight.git
 cd project_nightlight
-git switch use-uv          # until the uv migration is merged
+git switch migrate-to-uv-and-python-3-13          # until the uv migration is merged
 uv sync --locked
 uv run nightlight play examples/test_pattern.nl
 ```
