@@ -1,0 +1,27 @@
+[project]
+name = "nightlight"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+  "adafruit-blinka",
+  "adafruit-circuitpython-lis3dh",
+  "attrs",
+  "matplotlib",
+  "noise",
+  "numpy",
+  "pillow",
+  "youtube-dl",
+]
+
+[project.scripts]
+nightlight = "nightlight.cli:main"
+
+[dependency-groups]
+dev = ["pytest"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["nightlight*"]

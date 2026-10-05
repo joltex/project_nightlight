@@ -23,6 +23,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.venv/
 
 #PyCharm
 .idea/
@@ -31,3 +32,4 @@ wheels/
 *.swp
 
 vids/
+
